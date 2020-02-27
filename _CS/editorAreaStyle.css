@@ -1,0 +1,25 @@
+.textArea
+{
+    width:92%;
+    height:500px;
+    resize:none;
+}
+
+.box
+{
+	box-sizing:border-box;
+	-moz-box-sizing:border-box; /* Firefox */
+	-webkit-box-sizing:border-box; /* Safari */
+	width:50%;
+	float:left;
+}
+
+.background
+{
+	text-align: center;
+}
+
+body {
+  background: #ecf0f1;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", Verdana, sans-serif;
+}

@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="_CS/editorAreaStyle.css">
+<script src="_JS/jquery.js"></script>
+
 <head>
-	<title>New World</title>
+    <title>New World</title>
 </head>
+
+<script type="text/javascript">
+    function changeOutput(){
+		var Text = $('#editorArea').val();
+		$('#outputArea').text(Text);
+	}
+</script>
+
 <body>
+    <div class="background">
+        <form class="box">
+<textarea class="textArea" id="editorArea" maxlength="100000" onkeyup="changeOutput()">
+</textarea>
+        </form>
+        <div class="box">
+            <textarea class="textArea" id="outputArea" maxlength="100000" readonly="true">
+    		</textarea>
+        </div>
+    </div>
+	
 
-Welcome to this new land.
-
+	<script type="text/javascript">
+		$('outputArea').
+	</script>
 </body>
+
 </html>
