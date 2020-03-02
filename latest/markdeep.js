@@ -33,7 +33,7 @@ highlight.min.js 9.13.1 (C) 2017 Ivan Sagalaev https://highlightjs.org/*/
 (function() {
 'use strict';
 
-var MARKDEEP_FOOTER = '<div class="markdeepFooter"><i>愿长风破浪</i><div style="display:inline-block;font-size:13px;font-family:\'Times New Roman\',serif;vertical-align:middle;transform:translate(-3px,-1px)rotate(135deg);">&#x2712;</div></div>';
+var MARKDEEP_FOOTER = '<div class="markdeepFooter"><i>愿长风破浪&nbsp;&nbsp</i><div style="display:inline-block;font-size:13px;font-family:\'Times New Roman\',serif;vertical-align:middle;transform:translate(-3px,-1px)rotate(135deg);">&#x2712;</div></div>';
 //var MARKDEEP_FOOTER = '<div class="markdeepFooter"><i>formatted by <a href="https://casual-effects.com/markdeep" style="color:#999">Markdeep&nbsp;1.09&nbsp;&nbsp;</a></i><div style="display:inline-block;font-size:13px;font-family:\'Times New Roman\',serif;vertical-align:middle;transform:translate(-3px,-1px)rotate(135deg);">&#x2712;</div></div>';
 
 {
@@ -787,6 +787,9 @@ var CZECH = {
 };
 
 
+
+
+
 var ITALIAN = {
     keyword: {
         table:     'tabella',
@@ -1050,7 +1053,59 @@ var JAPANESE = {
         '&ldquo;': '「',
         '&rdquo;': '」'
     }
-};    
+};
+
+var CHINESE = {
+    keyword: {
+        table:     '表',
+        figure:    '图',
+        listing:   '一览',
+        diagram:   '图表',
+        contents:  '目录',
+
+        sec:       '节',
+        section:   '节',
+        subsection: '项',
+        chapter:   '章',
+
+        Monday:    '周一',
+        Tuesday:   '周二',
+        Wednesday: '周三',
+        Thursday:  '周四',
+        Friday:    '周五',
+        Saturday:  '周六',
+        Sunday:    '周日',
+
+        January:   '1月',
+        February:  '2月',
+        March:     '3月',
+        April:     '4月',
+        May:       '5月',
+        June:      '6月',
+        July:      '7月',
+        August:    '8月',
+        September: '9月',
+        October:   '10月',
+        November:  '11月',
+        December:  '12月',
+
+        jan: '1月',
+        feb: '2月',
+        mar: '3月',
+        apr: '4月',
+        may: '5月',
+        jun: '6月',
+        jul: '7月',
+        aug: '8月',
+        sep: '9月',
+        oct: '10月',
+        nov: '11月',
+        dec: '12月',
+
+        '&ldquo;': '「',
+        '&rdquo;': '」'
+    }
+};
     
 // Translated by Sandor Berczi
 var GERMAN = {
@@ -1245,7 +1300,8 @@ var LANG_TABLE = {
     it: ITALIAN,
     lt: LITHUANIAN,
     cz: CZECH,
-    es: SPANISH
+    es: SPANISH,
+    cn: CHINESE
     // Contribute your language here! I only accept translations
     // from native speakers.
 };
