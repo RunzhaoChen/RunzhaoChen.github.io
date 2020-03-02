@@ -1,0 +1,124 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-"> <link rel="stylesheet" href="../latest/journal.css?">
+
+
+**MATLAB**
+
+Learn matlab from this website [易百](https://www.yiibai.com/matlab/matlab_operators.html#article-start).
+
+
+Section 1 Draw 
+=================================================================
+We use **plot()** function to draw graph.
+
+1. Define a function _y = f(x)_ .
+2. Determine the range of x.
+3. Use plot(x, y)
+
+`f(x) = 2*x`
+The code below shows how to use it. X ranges _[0, 100]_ and the incremental is _5_.
+~~~ matlab
+x = [0:5:100];
+y = 2*x;
+plot(x, y)
+~~~
+
+![y = 2*x](http://www.yiibai.com/uploads/images/201710/0710/160111035_43311.png)
+
+
+`f(x) = x.^2`
+~~~ matlab
+x = [1 2 3 4 5 6 7 8 9 10];
+x = [-100:10:100];
+y = x.^2;
+plot(x, y)
+~~~
+
+![y = x^2](http://www.yiibai.com/uploads/images/201710/0710/358111048_26803.png)
+
+
+## Add title, tags, grid-lines and zoom.
+
+- The **xlabel** and **ylabel** order make tags on x-axis and y-axis
+- The **title** order add title to graph.
+- The **grid on** order makes grid-lines on graphs.
+- The **axis equal** order makes two axes equal.
+- The **axis square** order makes a square chart.
+
+For example:
+~~~matlab
+x = [0:0.01:10];
+y = sin(x);
+plot(x, y), xlabel('x'), ylabel('Sin(x)'), title('Sin(x) Graph'),
+~~~
+
+![y = sin(x)](http://www.yiibai.com/uploads/images/201710/0710/232111054_10060.png)
+
+
+
+## Draw multiple function graphs on one chart
+
+~~~matlab
+x = [0:0.01:10];
+y = sin(x);
+g = cos(x);
+plot(x, y, x, g, '.-'), legend('Sin(x)', 'Cos(x)')
+~~~
+
+![Figure [robot]: multiple functions](http://www.yiibai.com/uploads/images/201710/0710/792111056_31081.png)
+
+
+
+## Set color on graphs
+
+MATLAB provides eight basic color to draw graphs, the table below shows code to color.
+
+code | color
+---- | ----
+w | White
+k|Black
+b|Blue
+r|Red
+c|Cyan
+g|Green
+m|Magenta
+y|Yellow
+[Table [states]: Code to color.]
+
+For example:
+Let's draw two graphs of polynomial.
+
+![](http://www.yiibai.com/uploads/images/201710/0810/474121000_29840.png)
+
+and the code is:
+~~~matlab
+x = [-10 : 0.01: 10];
+y = 3*x.^4 + 2 * x.^3 + 7 * x.^2 + 2 * x + 9;
+g = 5 * x.^3 + 9 * x + 2;
+plot(x, y, 'r', x, g, 'g')
+~~~
+
+![Figure [robot]: Set color](http://www.yiibai.com/uploads/images/201710/0810/122121002_93678.png)
+
+
+## Set axis scale 
+
+The **axis** order is used for axis scale. 
+~~~matlab
+axis ( [xmin xmax ymin ymax ] )
+~~~
+
+For exp:
+~~~matlab
+x = [0:0.01:10];
+y = exp(-x).* sin(2*x + 3);
+plot(x, y), axis( [0 10 -1 1] )
+~~~
+
+![Figure [robot]: Set axis scale](http://www.yiibai.com/uploads/images/201710/0810/273121006_83077.png)
+
+
+
+
+<style class="fallback"></style><script>markdeepOptions={tocStyle:'long'};</script>
+<script src="../latest/markdeep.js?" charset="utf-8"></script>
+

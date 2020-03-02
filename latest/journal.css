@@ -3,8 +3,8 @@
 body#md {
     font-weight: 400;
     font-size: 16px;
-    font-family: Arial, Helvetica, "sans serif";
-    text-align: left;
+/*    font-family: Arial, Helvetica, "sans serif";
+*/  text-align: left;
     line-height: 170%;
 }
 
@@ -37,8 +37,8 @@ img.markdeep {
 }
 
 .md div.title, .md div.subtitle, .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
-    font-family: 'Roboto', Arial, Helvetica, "sans serif";
-    font-weight: 300;
+/*    font-family: 'Roboto', Arial, Helvetica, "sans serif";
+*/    font-weight: 300;
 }
 
 .md div.title {
@@ -53,7 +53,8 @@ img.markdeep {
 }
 
 .md pre.tilde {
-    background: #F0F0F0;
+    background: #F0F0F0;  
+    /*F6F5EC*/
 }
 
 .md div.afterTitles {
@@ -96,8 +97,8 @@ img.markdeep {
 }
 
 .md .longTOC {
-    font-family: 'Roboto', Arial, Helvetica, "sans serif";
-    font-weight: 300;
+/*    font-family: 'Roboto', Arial, Helvetica, "sans serif";
+*/    font-weight: 300;
 }
 
 
@@ -134,7 +135,7 @@ img.markdeep {
         overflow-y:scroll;
         font-size: 13px;
         font-family: inherit;
-        background: #eee;
+        background: #F6F5EC;
         position: fixed;
         left: 0px;
         top: 0px;
