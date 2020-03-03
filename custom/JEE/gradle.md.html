@@ -1,0 +1,315 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-"> <link rel="stylesheet" href="../../latest/journal.css?">
+
+
+**Gradle**
+
+What is gradle?
+
+* DSL    => 领域特定语言(domain-specific language), 专用于某个应用程序的语言. 
+* groovy => groovy就是Gradle的DSL, gradle就是groovy.
+* task   => 一个build.gradle文件中有多个task(任务), 调用时执行.[参见](#gradle是什么?/gradle的helloworld)
+* action => 一个task中有多个action(动作), 调用task时执行这个task中的action.
+* To Do  => 
+
+
+
+Gradle是什么?
+=================================================================
+..
+
+## 安装gradle
+直接从官网http://gradle.org/downloads下载发布版.然后手动添加环境.<br>
+
+如果是MAC OS, 直接:
+```bash
+$ brew install gradle
+```
+
+配好环境后检查gradle版本:
+```bash
+$ gradle -v
+```
+
+## Gradle的Hello World
+每个Gradle构建都是以一个默认脚本build.gradle开始.(作用相当于C语言中的main函数).
+当在Shell中执行gradle命令时, gradle会自动寻找并执行build.gradle文件.
+
+1. 新建一个build.gradle文件
+2. 在文件中添加一个名叫HelloWorld的task.
+3. 在task中添加一个动作doLast.
+4. 在doLast中写下`println 'Hello World' `
+5. 执行该task.
+
+代码如下:
+~~~bash
+$ vim build.gradle
+task helloWorld {
+	doLast {
+		println 'Hello world!'
+	}
+}
+$ gradle -q helloWorld
+~~~
+-q表示quiet, 只输出task相关信息.<br><br>
+
+也可以用左移符号 << 简化表示doLast:
+~~~bash
+task helloWorld << {
+	println 'Hello World!'
+}
+~~~
+
+
+## 给你一个Gradle项目的例子
+
+
+
+如何构建脚本?
+=================================================================
+..
+
+## 如何管理依赖?
+..
+
+## 多项目模块
+..
+
+## Gradle测试
+..
+
+## 扩展Gradle
+..
+
+## 集成与迁移
+..
+
+从构建到部署
+=================================================================
+..
+
+Gradle可以在_Eclipse, Intellij IDEA 和 Sublime Text_中使用.
+
+## IDE支持和工具
+
+
+IDE以项目为基本单位, 与Gradle项目类似, 每一个项目都定义了
+
+* 类型(如Web应用于桌面应用)
+* 外部依赖(如JAR, 源代码和Javadoc文件)
+* 个人设置
+
+Gradle的工作过程如下所示:
+
+*********************************************************************
+*              __________       IDE project file         IDE        
+*Gradle  Do   |  ..      |        .---------.         .---+----.    
+*.----.  task |  Script  |  Made  |xx       | Export  |   |    |    
+*| ** +------>|  ..      +------->|xx       +-------->|   |    |    
+*'----'       |  ..      |        |xx       |         |	  |    |
+*             '----------'        '---------'         '---+----'    
+*********************************************************************
+	[Figure [robot]: Gradle的工作流程]
+
+有了这些项目文件, 一个项目就可以在IDE中使用, 并且在多人之间共享配置数据.<br>
+然而不同IDE的项目文件格式不统一, 常用的是**XML和JSON**.<br>
+而Gradle, 本文的主角, 可以通过内部的脚本在不同的IDE中生成相同的项目文件,
+这样可以十分方便地转移项目到不同的IDE.<br>
+
+有了Gradle, 在转移项目的时候, 就只需要转移源文件即可. 
+这一过程类似于把Java代码编译成class文件, 项目文件可以重新生成.
+
+**Gradle的配置元素**
+
+* 多项目构建定义, 包括**编译时项目依赖**
+* 自定义配置用来声明**外部依赖**
+* 为**集成测试和功能测试**自定义_source set_
+
+### 使用IDEA插件
+..
+### 项目格式和文件
+IDEA将项目文件保存早项目的根目录下. 实际数据是XML格式的:
+
+* .ipr: 存储了**核心项目信息**. 在多项目环境下, 对于子项目的引用就保存在这里.
+* .iml: 在IDEA中, 一个功能单元(又名module) 存储在一个_.iml_的模块文件中.一个模块配置文件中包含了**源代码相关**的配置信息.
+* .iws: 包含了特定的工作控件设置. 不管单项目还是多项目都**只有一个**_setting_文件.
+
+To Do应用程序基于的项目文件如下图所示 (D表示文件夹, F表示文件),
+每个项目----根目录和子目录----至少包含了模块配置文件. _.ipr_ 和 _.iws_文件保存在跟项目
+级别的路径下. And then, 你会应用并执行Gradle idea插件来执行这些文件.
+
+*********************************************************************
+* IDEA project files
+*   .---.
+*   | D | todo
+*   '---'
+*     |	
+*     |  .---.
+*     +--+ D | moudel
+*     |	 '-+-'
+*     |    |  
+*     |    |  .---.
+*     |    +--+ F | moudel.iml <----------------- moudel 模 块 设 置
+*     |       '--'
+*     |  .---.
+*     +--+ D | repository
+*     |  '-+-'  
+*     |    |
+*     |    |  .---.
+*     |    +--+ F | reposiory.iml <-------------- repository 模 块 配 置
+*     |       '--'
+*     |  .---.
+*     +--+ D | web
+*     |  '-+-'
+*     |    |
+*     |    |  .---.
+*     |    +--+ F |	web.iml <-------------------- web 模 块 配 置
+*     |       '--'
+*     |  .---.
+*     +--+ F | todo.iml <------------------------ 根 模 块 配 置
+*     |  '--'
+*     |
+*     |  .---.
+*     +--+ F | todo.ipr <------------------------ 核 心 项 目 配 置
+*     |  '--'
+*     |  
+*     |  .---.
+*     +--+ F | todo.iws <------------------------ 个 人 工 作 空 间 配 置
+*        '--'
+*********************************************************************
+		[Figure [robot]: To Do程序的项目文件]
+
+### 在build.gradle中添加并执行插件.
+Gradle的标准发布包包含了idea核心插件. 你可以用这个插件来生成上述讨论的所有intelli
+项目文件. 为了给To Do 应用程序的所有项目生成项目文件, 需要将idea插件添加到
+<big>build.gradle</big>的 **allprojects** 配置块中:
+
+```
+allprojects{
+	apply plugin: 'idea'
+}
+```
+
+这个插件提供的主要`ask`就是idea. 执行该task, 会生成如下所示的所有项目文件. 
+
+*********************************************************************
+* $ gradle idea                
+* :ideaModule                  | 三 者 为 根 项 目 创 建 的 模 块 , 
+* :ideaProject                 | 
+* :ideaWorkspace               | 项 目 和 工 作 空 间 相 关 文 件
+* :idea
+* :model:ideaModule                 <---+
+* :model:idea                           |
+* :repository:ideaModule            <---+ 对 于 子 项 目 , 只 有 生 成
+* :repository:idea                      | 模 块 文 件 的 task 被 执 行
+* :web:ideaModule                   <---+
+* :web:idea                  
+*********************************************************************
+       [Figure [robot]: 执行gradle中的插件生成 idea项目文件]
+
+现在你已经配置好了<big>可以生成idea项目文件</big>的build.gradle插件. 但是idea插件还不能
+识别自定义的 `source set`和`配置`. 此时通过只能自定义实现. 
+下面一节教你如何调整生成的配置数据.
+
+### 自定义配置
+Gradle idea插件为**自定义项目**文件, **module**文件和**工作空间**文件的生成设置树形暴露了
+丰富的DSL. 下标显示了访问内建模型的相关配置.
+
+属性名 | Gradle API类 | 插件 | 简述
+---   | ------------ | --- | ----
+project | IdeaProject  | idea | 配置Project信息
+module | IdeaModule    | idea | 配置Module信息
+workspace | IdeaWorkspace | idea | 配置Worksapce信息
+		[Table [states]: IDEA插件属性]
+
+修改了配置后, 最好用 **cleanIdea**命令将已有的项目文件清理掉.
+```bash
+$ gradle cleanIdea idea
+```
+
+不同IDE的 IDE task用法在 Eclipse和IDEA主要是相同的, 这样可以方便地切换IDE.
+
+#### 设置根项目属性
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+idea{
+	project{
+		jdkName = '1.6'
+		languageLevel = '1.6'
+	}
+}
+//设置特定的JDK和Java语言版本
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#### 为所有子项目(modole)设置模块属性
+如果想在多项目构建中为所有子项目做自定义配置, 可以使用subproject配置块.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+subprojects {
+	apply plugin: 'java'
+	idea {
+		module {
+			downloadSources = true		//所有子项目外部依赖下载源文件
+			downloadJavadoc = false     //..子项目的Javadoc不下载
+		}
+	}
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#### 为repository子项目(module)添加自定义的source set
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+project(':repository'){
+	idea {
+		module {
+			sourceSets.integrationTest.allSource.srcDirs.each { //遍历integration Test source set的所有目录
+				testSourceDirs += it            //把每个目录添加到IntelliJ所识别的test源文件中
+			}
+		}
+	}
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#### 为Web子项目(mudule)添加自定义source set和配置
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+project(':web') {
+	idea{
+		module{
+			sourceSets.funtionalTest.allSoure.srcDirs.each {     //遍历functionalTest source set的所有目录
+				testSourceDirs += it
+			}
+
+			scopes.TEST.plus += configurations.functTestCompile  //添加自定义配置
+			scopes.TEST.plus += configurations.functTestRuntime  //到模块classpath
+		}
+	}
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#### 使用XML hook预配置项目设置
+
+
+#### 使用merge hook预配置项目设置
+
+
+
+**导入项目**<br>
+
+
+## 构建多语言项目
+
+## 代码质量管理和监测
+
+## 持续集成
+
+## 打包和发布
+
+## 基础环境准备和部署
+
+
+附属
+=================================================================
+
+
+<style class="fallback"></style><script>markdeepOptions={tocStyle:'long'};</script>
+<script src="../../latest/markdeep.js?" charset="utf-8"></script>
+
