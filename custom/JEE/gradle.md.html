@@ -9,16 +9,15 @@ What is gradle?
 * groovy => groovy就是Gradle的DSL, gradle就是groovy.
 * task   => 一个build.gradle文件中有多个task(任务), 调用时执行.[参见](#gradle是什么?/gradle的helloworld)
 * action => 一个task中有多个action(动作), 调用task时执行这个task中的action.
-* To Do  => 
 
-
+---《实战Gradle》学习笔记
 
 Gradle是什么?
 =================================================================
 ..
 
 ## 安装gradle
-直接从官网http://gradle.org/downloads下载发布版.然后手动添加环境.<br>
+直接从[官网](http://gradle.org/downloads)下载发布版.然后手动添加环境.<br>
 
 如果是MAC OS, 直接:
 ```bash
@@ -52,16 +51,308 @@ $ gradle -q helloWorld
 ~~~
 -q表示quiet, 只输出task相关信息.<br><br>
 
-也可以用左移符号 << 简化表示doLast:
+<big>也可以用左移符号 << 简化表示doLast:</big>
 ~~~bash
 task helloWorld << {
 	println 'Hello World!'
 }
 ~~~
 
+### 动态任务定义和任务链
+~~~bash linenumbers
+task startSession << {
+	chant()
+}
 
-## 给你一个Gradle项目的例子
+def chant() {
+	ant.echo(message: 'Repeat after me...')   //1.隐藏对Ant任务的使用
+}
 
+3.times {
+	task "yayaGradle$it" << {                 //2.注意$符号,$it是一个对动态任务的定义
+		println 'Gradle hahaha'
+	}
+}
+
+yayaGradle0.dependsOn startSession             // 
+yayaGradle2.dependsOn yayaGradle1, ayGradle0   // 3.三行都是设置任务依赖
+task groupTherapy(dependsOn: yayaGradle2)      // 
+~~~
+
+> 
+> task依赖链: startSession <- yaya0 <- yaya1 <- yaya2 <- groupTherapy
+> 
+
+在上述代码中, 使用了三个**高级特性**
+
+1. Gradle和Ant有很好的集成
+2. 动态task. 以0开头,第一次为yayGradle0.
+3. dependsOn说明了task之间的依赖, 被依赖的task先执行.详见[第四章](gradle.md.html)
+
+~~~bash linenumbers
+//动态任务的输出结果
+$ gradle groupTherapy
+:startSession
+[ant:echo] Repeat after me...
+:yayaGradle0
+Gradle hahaha
+:yayaGradle1
+Gradle hahaha
+:yayaGradle2
+Gradle hahaha
+:groupTherapy
+~~~
+
+
+## 在命令行使用Gradle
+学好命令行, 理解会更深.
+
+### 列出项目中所有可用的task
+使用tasks命令:
+~~~bash linenumbers
+$ gradle -q tasks
+
+------------------------------------------------------------
+Tasks runnable from root project
+------------------------------------------------------------
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'TestGradle'.
+components - Displays the components produced by root project 'TestGradle'. [incubating]
+dependencies - Displays all dependencies declared in root project 'TestGradle'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'TestGradle'.
+dependentComponents - Displays the dependent components of components in root project 'TestGradle'. [incubating]
+help - Displays a help message.
+model - Displays the configuration model of root project 'TestGradle'. [incubating]
+outgoingVariants - Displays the outgoing variants of root project 'TestGradle'.
+projects - Displays the sub-projects of root project 'TestGradle'.
+properties - Displays the properties of root project 'TestGradle'.
+tasks - Displays the tasks runnable from root project 'TestGradle'.
+
+To see all tasks and more detail, run gradle tasks --all
+
+To see more detail about a task, run gradle help --task <task>
+~~~
+
+关于输出, 有几点说明:
+
+1. 任务组. Gradle中的任务组可以看作是多个task的集群, 每个构建脚本都会默认暴露Help tasks任务组.
+2. 如果某儿task不属于一个任务组, 那么会显示在 Other tasks中, 在这里可以找到groupTherapy.
+3. 在[第四章](gradle.md.html)中, 可以学到如何将task添加到一个任务组中.
+
+如果想看到所有的task, 使用**--all**选项
+~~~bash
+$ gradle -q tasks --all
+...
+-----------
+dodo
+hello
+prepareKotlinBuildScriptModel
+~~~
+
+* 任务依赖会以缩进形式显示在根task下.
+
+
+
+### 任务执行
+在之前, 通过给命令gradle一个参数来执行指定的任务 
+之后gradle会执行该任务以及所有的依赖.<br>
+你也可以一次指定多个任务作为参数.
+```bash
+$ gradle yayaGradle0 groupTherapy
+..
+```
+
+[查看输出](gradle.md.html#gradle是什么?/gradle的helloworld/动态任务定义和任务链)
+
+**但是**, 哪怕被执行后又被依赖它的任务执行, 任务通常也只会**执行一次**.
+
+### 以任务名缩写执行任务
+Gradle的一大特性就是能以**驼峰式**的缩写在命令行上运行任务.
+比如以下两者:
+~~~bash
+$ gradle yayaGradle0 groupTherapy
+$ gradle yG0 gT
+~~~
+
+* 如果驼峰不唯一, 将导致错误
+
+### 在执行时排除一个任务
+有时候你想要在构建运行时排除一个指定任务, 可以使用**-x**选项实现.<br>
+如下,排除yG0:
+~~~bash
+$ gradle gT -x yG0
+:yayaGradle1
+Gradle rocks
+:yayaGradle2
+Gradle rocks
+:group Therapy
+~~~
+* 当排除一个任务时, Gradle自动排除它的依赖任务, 比如本例就没有执行 startSession 任务.
+
+### 命令行选项
+gradle命令可以同时定义多个选项.
+常用的一些选项如下:
+
+* -?, -h, --help: 查看所有可用的命令行选项以及描述.
+* -b, --build-file: Gradle构建脚本的默认命令约定是build.gradle, 使用该命令可以执行
+  一个自定名字的构建脚本.(如: `gradle -b test.gradle`)
+* --offline: 以离线模式运行构建,进在本地缓存中检查依赖是否存在.?
+* 参数选项
+	* -D, --system-prop: ..
+	* -P, --Project-prop: ..
+* 日志选项
+	* -i, --info: 输出构建时的日志信息.
+	* -s, --stacktrace: 如果构建中出现错误, -s选项会在有异常是打印出简短的堆栈跟踪信息,帮你进行调试.
+	* -q: 静默模式
+* 帮助任务
+	* tasks: (略)
+	* properties: 显示项目中所有可用属性.
+
+### gradle守护进程
+
+* Mac OS 和 *nix: 在shell中运行命令 `ps | grep gradle`.
+..
+
+### 总结
+..
+
+# 一个Gradle项目的例子
+
+这一章以实现一个TODO list Web应用为例, 展示如何在Java Web开发中使用Gradle
+
+## Todo list Web应用的功能和设计
+
+ToDo list应用可以通过互联网访问并管理数据仓库中的执行项目
+
+ToDo列表就是一个计划表, 新任务记录下来, 完成某一项就划掉, 而且所有的任务都有一个执行的顺序,. 而使用程序实现可以
+把所有的修改记录在数据库中.
+
+![Figure [robot]: TODO应用设计](https://img-blog.csdnimg.cn/2020030423382965.png)
+
+## 在Java项目里使用Gradle
+
+构建一个独立的ToDo应用, 首先要编译源代码, 然后把class文件打包成JAR文件.
+这两步可以使用jdk的`javac`和`jar`这样的工具实现, 然而过程相当繁琐.<br>
+
+为了自动化实现这些繁琐的步骤, 就需要使用到Gradle的脚本.
+
+### 使用Gradle的Java插件
+
+首先, 在项目里创建一个**build.gradle**文件, 然后在该文件中写下:
+~~~
+apply plugin: 'java'
+~~~
+
+默认情况下, 插件会到<big>src/main/java</big>目录下查找源文件, 你需要先创建这个
+目录, 然后把源代码(.java)放到java文件夹里.<br>
+
+![Figure [robot]: 初始目录](https://img-blog.csdnimg.cn/20200304234358394.png)
+
+#### 使用gradle命令构建项目
+写好build.gradle文件并且配置好**scr目录**之后, 在根目录下运行gradle
+~~~
+$ gradle build
+~~~
+
+![Figure [robot]: 构建后的目录](https://img-blog.csdnimg.cn/20200304234450768.png)
+
+每一行的输出都表示Java插件的一个任务. **UP-TO-DATE**表示跳过这个任务.
+
+执行之后, 项目的根目录下回多出几个文件夹. 
+
+其中,<big>build</big>文件夹内有着**class文件,测试报告和JAR文件**,
+还有一些和构建相关的临时文件.
+
+在**build/libs**目录下, 生成着JAR(todo-app.jar)文件, 并且是可运行的.
+
+#### 运行项目
+~~~bash
+$ java -cp build/classes/main com.manning.gia.todo.ToDoApp
+(以下为todo程序显示的内容)
+--- To Do Application ---
+Please make a choice:
+...
+> 
+~~~
+
+### 定制项目
+Java插件是一个灵活的框架, 你可以根据自己的需要更改一些默认值.
+
+查看Java插件的可配置表单:
+[Gradle官网](www.gradle.org/docs/current/dsl/)
+
+#### 修改项目插件和项目属性
+上一个例子[链接](gradle.md.html)是从class运行项目的,
+如果要从JAR文件启动应用, 清单文件MANIFEST.MF需要包含信息头Main-Class.
+代码如下:
+
+~~~javascript linenumbers
+version = 0.1			// 定义项目版本
+sourceCompatibility = 1.6  // 设置Java版本编译兼容1.6
+
+jar {
+	manifest {
+		attributes 'Main-Class': 'com.manning.gia.ToDoApp'
+		//将Main-Class头文件添加到JAR文件代码清单中
+	}
+}
+~~~
+组装完JAR文件之后, JAR文件的名字会加上应用的版本号(todo-app-0.1.jar, 原来是todo-app.jar).
+
+之后, 通过以下命令可以运行JAR文件.
+~~~
+$ java -jar build/libs/todo-app-0.1.jar
+~~~
+
+#### 改造遗留项目(改造项目目录结构)
+
+_以下代码可以更改项目默认结构_
+..
+
+~~~javascript linenumbers
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src']	//用不同的目录列表代替约定的源代码目录(src/main/java)
+		}
+	}
+	test {
+		java {
+			srcDirs = ['test']  //用不同的目录列表(newTest)代替约定的测试代码目录(src/main/test)
+		}
+	}
+}
+buildDir = 'out'		//改变项目输出属性(路径)到out目录, (原build目录)
+~~~
+
+### 配置外部依赖repositories,dependencies
+
+两个重要的DSL配置元素:<big> repositories 和 dependencies</big>, (可以翻译为'库'和'依赖').
+
+#### 定义repositories(仓库)
+在Java世界里, 依赖都是以JAR文件的形式发布和使用的.许多类库都可以在仓库中找到,仓库可以是一个文件系统或者一个中心服务器.
+
+Gradle要求你定义至少一个仓库来使用依赖.为此,你需要使用公共的可访问的仓库Meaven Central:
+~~~
+repositories{
+	mavenCentral()
+}
+~~~
+
+#### 定义依赖
+一个依赖是通过**group标识符, 名字和一个指定版本**来确定的.如下面代码片段所示, 你会使用类库的3.1版本:
+~~~java linenumbers
+dependencies {
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.1'
+}
+~~~
 
 
 如何构建脚本?
@@ -108,7 +399,7 @@ Gradle的工作过程如下所示:
 *'----'       |  ..      |        |xx       |         |	  |    |
 *             '----------'        '---------'         '---+----'    
 *********************************************************************
-	[Figure [robot]: Gradle的工作流程]
+	[: Gradle的工作流程]
 
 有了这些项目文件, 一个项目就可以在IDE中使用, 并且在多人之间共享配置数据.<br>
 然而不同IDE的项目文件格式不统一, 常用的是**XML和JSON**.<br>
@@ -229,11 +520,11 @@ $ gradle cleanIdea idea
 不同IDE的 IDE task用法在 Eclipse和IDEA主要是相同的, 这样可以方便地切换IDE.
 
 #### 设置根项目属性
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 idea{
 	project{
-		jdkName = '1.6'
-		languageLevel = '1.6'
+		jdkName = '1.8'
+		languageLevel = '1.8'
 	}
 }
 //设置特定的JDK和Java语言版本
@@ -241,7 +532,7 @@ idea{
 
 #### 为所有子项目(modole)设置模块属性
 如果想在多项目构建中为所有子项目做自定义配置, 可以使用subproject配置块.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 subprojects {
 	apply plugin: 'java'
 	idea {
@@ -254,7 +545,7 @@ subprojects {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### 为repository子项目(module)添加自定义的source set
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~groovy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 project(':repository'){
 	idea {
 		module {
